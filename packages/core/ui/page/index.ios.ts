@@ -118,6 +118,13 @@ class UIViewControllerImpl extends UIViewController {
 		}
 
 		const frame = this.navigationController ? (<any>this.navigationController).owner : null;
+		const newEntry = this[ENTRY];
+
+		// Don't raise event if currentPage was showing modal page.
+		if (!owner._presentedViewController && newEntry && (!frame || frame.currentPage !== owner)) {
+			const isBack = isBackNavigationTo(owner, newEntry);
+			owner.onNavigatingTo(newEntry.entry.context, isBack, newEntry.entry.bindingContext);
+		}
 
 		if (frame) {
 			if (!owner.parent) {
@@ -325,6 +332,8 @@ class UIViewControllerImpl extends UIViewController {
 							right: 0,
 						});
 						this.additionalSafeAreaInsets = additionalInsets;
+					} else {
+						this.additionalSafeAreaInsets = null;
 					}
 				}
 			}
